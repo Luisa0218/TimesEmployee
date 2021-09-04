@@ -2,7 +2,7 @@
 
 namespace TimesEmployee.Common.Models
 {
-    public class Tasks
+    public class Times
     {
         public int IdEmployee { get; set; }
 
