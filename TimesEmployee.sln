@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31613.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimesEmployee.Common", "TimesEmployee.Common\TimesEmployee.Common.csproj", "{4BBAA6D3-4628-4F64-9439-A442DACDC072}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimesEmployee.Common", "TimesEmployee.Common\TimesEmployee.Common.csproj", "{4BBAA6D3-4628-4F64-9439-A442DACDC072}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimesEmployee.Functions", "TimesEmployee.Functions\TimesEmployee.Functions.csproj", "{353D5471-43F6-4596-AC4E-6E272D76E501}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimesEmployee.Functions", "TimesEmployee.Functions\TimesEmployee.Functions.csproj", "{353D5471-43F6-4596-AC4E-6E272D76E501}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimesEmployee.Test", "TimesEmployee.Test\TimesEmployee.Test.csproj", "{F3C7E85C-1044-43A2-9307-B5029D7B9288}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimesEmployee.Test", "TimesEmployee.Test\TimesEmployee.Test.csproj", "{F3C7E85C-1044-43A2-9307-B5029D7B9288}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
