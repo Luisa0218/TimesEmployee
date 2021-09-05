@@ -69,6 +69,66 @@ namespace TimesEmployee.Functions.Functions
 
         }
 
+        [FunctionName(nameof(UpdateTimes))]
+        public static async Task<IActionResult> UpdateTimes(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "times/{Id}")] HttpRequest req,
+            [Table("times", Connection = "AzureWebJobsStorage")] CloudTable timesTable,
+            string Id,
+            ILogger log)
+        {
+            log.LogInformation($"Update for IdEmployee: {Id}, in timesTable.");
+
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            Times times = JsonConvert.DeserializeObject<Times>(requestBody);
+
+            // Validate Employee Id 
+            TableOperation findOperation = TableOperation.Retrieve<TimesEntity>("TIMES", Id);
+            TableResult findResult = await timesTable.ExecuteAsync(findOperation);
+
+            if (findResult.Result == null)
+
+            {
+                return new BadRequestObjectResult(new Response
+                {
+
+                    Message = " id employee not found ."
+
+                });
+            }
+
+            //Update Employee id 
+
+            TimesEntity timesEntity = (TimesEntity)findResult.Result;
+            timesEntity.DateHour = times.DateHour;
+            timesEntity.Type = times.Type;
+
+            if (!string.IsNullOrEmpty(times.IdEmployee.ToString()))
+            {
+                timesEntity.Type = times.Type;
+            }
+
+            TableOperation addOperation = TableOperation.Replace(timesEntity);
+            await timesTable.ExecuteAsync(addOperation);
+
+            string message = $"Update: {Id} update in timesTable.";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+
+                IdEmployee = times.IdEmployee,
+                Message = message,
+                Result = timesEntity
+
+
+            });
+
+
+
+
+        }
+
     }
 
 }
