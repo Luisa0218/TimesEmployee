@@ -180,6 +180,37 @@ namespace TimesEmployee.Functions.Functions
             });
         }
 
+        [FunctionName(nameof(DeleteTimes))]
+        public static async Task<IActionResult> DeleteTimes(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "times/{Id}")] HttpRequest req,
+            [Table("times", "TIMES", "{Id}", Connection = "AzureWebJobsStorage")] TimesEntity timesEntity,
+            [Table("times", Connection = "AzureWebJobsStorage")] CloudTable timesTable,
+            string id,
+            ILogger log)
+        {
+            log.LogInformation($"Delete timesEmployee: {id}, received.");
+
+            if (timesEntity == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+
+                    Message = "TimesEmployee not found."
+                });
+            }
+
+            await timesTable.ExecuteAsync(TableOperation.Delete(timesEntity));
+            string message = $"TimesEmployee: {timesEntity.RowKey}, deleted.";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+
+                Message = message,
+                Result = timesEntity
+            });
+        }
+
 
     }
 
