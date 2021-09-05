@@ -152,6 +152,35 @@ namespace TimesEmployee.Functions.Functions
             });
         }
 
+        [FunctionName(nameof(GetTimesById))]
+        public static IActionResult GetTimesById(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "times/{Id}")] HttpRequest req,
+            [Table("times", "TIMES", "{Id}", Connection = "AzureWebJobsStorage")] TimesEntity timesEntity,
+            string id,
+            ILogger log)
+        {
+            log.LogInformation($"Get todo by idEmployee: {id}, received.");
+
+            if (timesEntity == null)
+            {
+                return new BadRequestObjectResult(new Response
+                {
+
+                    Message = "TimesEmployee not found."
+                });
+            }
+
+            string message = $"TimesEmployee: {timesEntity.RowKey}, retrieved.";
+            log.LogInformation(message);
+
+            return new OkObjectResult(new Response
+            {
+                Message = message,
+                Result = timesEntity
+            });
+        }
+
+
     }
 
 }
