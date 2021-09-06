@@ -9,8 +9,8 @@ namespace TimesEmployee.Functions.Functions
 {
     public static class Scheduled_Functions
     {
-        [FunctionName(nameof(ProgrammerTimes))]
-        public static async Task ProgrammerTimes(
+        [FunctionName(nameof(ConsolidatedProgrammer))]
+        public static async Task ConsolidatedProgrammer(
 
             [TimerTrigger("0 */1 * * * *")] TimerInfo myTimer,
             [Table("times", Connection = "AzureWebJobsStorage")] CloudTable timesTable,
