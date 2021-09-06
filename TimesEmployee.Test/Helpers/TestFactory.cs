@@ -78,7 +78,6 @@ namespace TimesEmployee.Test.Helpers
             return new Times
             { 
                 IdEmployee = 1,
-                DateHour = DateTime.UtcNow,
                 Type = 0,
                 
 

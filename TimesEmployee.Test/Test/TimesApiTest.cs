@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using TimesEmployee.Common.Models;
+using TimesEmployee.Functions.Entities;
 using TimesEmployee.Functions.Functions;
 using TimesEmployee.Test.Helpers;
 using Xunit;
@@ -47,5 +48,28 @@ namespace TimesEmployee.Test.Test
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
         }
 
+
+        [Fact]
+        public async void GetTimesById_Should_Return_200()
+        {
+            //Arrenge
+            MockCloudTableTimes mockTimes = new MockCloudTableTimes(new Uri("http://127.0.0.1:10002/devstoreaccount1/reports"));
+            TimesEntity timesEntity = TestFactory.GetTimesEntity();
+            Guid timesId = Guid.NewGuid();
+            DefaultHttpRequest request = TestFactory.CreatedHttpRequest(timesId);
+
+
+            //Act
+            IActionResult response =  TimesApi.GetTimesById(request, timesEntity, timesId.ToString(), logger);
+
+            //Assert
+            OkObjectResult result = (OkObjectResult)response;
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+        }
+
     }
 }
+
+    
+
+
