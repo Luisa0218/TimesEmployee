@@ -12,20 +12,21 @@ namespace TimesEmployee.Functions.Functions
     {
         [FunctionName(nameof(ProgrammerTimes))]
         public static async Task ProgrammerTimes(
-            
-            [TimerTrigger("0 */1 * * * *")]TimerInfo myTimer,
+
+            [TimerTrigger("0 */1 * * * *")] TimerInfo myTimer,
             [Table("times", Connection = "AzureWebJobsStorage")] CloudTable timesTable,
+            [Table("timesconsolidate", Connection = "AzureWebJobsStorage")] CloudTable timesTable2,
             ILogger log)
-           
+
         {
-            // TimesEntity = Tabla 1
+
             string filter = TableQuery.GenerateFilterConditionForBool("Consolidate", QueryComparisons.Equal, false);
             TableQuery<TimesEntity> query = new TableQuery<TimesEntity>().Where(filter);
             TableQuerySegment<TimesEntity> allTimesEntity = await timesTable.ExecuteQuerySegmentedAsync(query, null);
 
-            //CheckConsolidateEntity = Tabla 2
-            //TableQuery<ConsolidateEntity> queryConsolidate = new TableQuery<ConsolidateEntity>();
-            //TableQuerySegment<ConsolidateEntity> allCheckConsolidateEntity = await workingTimeTable.ExecuteQuerySegmentedAsync(queryConsolidate, null);
+            TableQuery<ConsolidatedEntity> queryconsolidatedtable = new TableQuery<ConsolidatedEntity>().Where(filter);
+            TableQuerySegment<ConsolidatedEntity> allTimesConsolidated = await timesTable2.ExecuteQuerySegmentedAsync(queryconsolidatedtable, null);
+
 
             log.LogInformation($"First foreach");
             foreach (TimesEntity reiterate in allTimesEntity)
@@ -39,7 +40,7 @@ namespace TimesEmployee.Functions.Functions
                         TimeSpan dateCalculated = (reiteratetwo.DateHour - reiterate.DateHour);
                         if (reiteratetwo.IdEmployee == reiterate.IdEmployee && reiteratetwo.Type == 1)
                         {
-                           
+
                             TimesEntity Times = new TimesEntity
                             {
                                 IdEmployee = reiteratetwo.IdEmployee,
@@ -67,11 +68,69 @@ namespace TimesEmployee.Functions.Functions
 
                             TableOperation updateTimesEntityTwo = TableOperation.Replace(TimesTwo);
                             await timesTable.ExecuteAsync(updateTimesEntityTwo);
-
+                            await CreatedConsolidate(allTimesConsolidated, reiterate, reiteratetwo, dateCalculated, timesTable2);
                         }
                     }
                 }
             }
+
+        }
+        public static async Task CreatedConsolidate(TableQuerySegment<ConsolidatedEntity> consolidatedEntity, TimesEntity dateTable, TimesEntity dateTableTwo, TimeSpan dateCalculated, CloudTable timesTable2)
+        {
+            if (consolidatedEntity.Results.Count == 0)
+            {
+                ConsolidatedEntity TimesConsolidate = new ConsolidatedEntity
+                {
+                    IdEmployee = dateTable.IdEmployee,
+                    Date = dateTable.DateHour,
+                    Minutes = dateCalculated.Minutes,
+                    PartitionKey = "TIMES",
+                    RowKey = Guid.NewGuid().ToString(),
+                    ETag = "*"
+                };
+
+                TableOperation insertTimesConsolidate = TableOperation.Insert(TimesConsolidate);
+                await timesTable2.ExecuteAsync(insertTimesConsolidate);
+            }
+            else
+            {
+                foreach (ConsolidatedEntity reiterateconsolidated in consolidatedEntity)
+                {
+                    //log.LogInformation("Actualizando consolidado segunda tabla");
+                    if (reiterateconsolidated.IdEmployee == dateTable.IdEmployee)
+                    {
+
+                        ConsolidatedEntity TimesConsolidate = new ConsolidatedEntity
+                        {
+                            IdEmployee = reiterateconsolidated.IdEmployee,
+                            Date = reiterateconsolidated.Date,
+                            Minutes = (double)(reiterateconsolidated.Minutes + dateCalculated.TotalMinutes),
+                            PartitionKey = reiterateconsolidated.PartitionKey,
+                            RowKey = reiterateconsolidated.RowKey,
+                            ETag = "*"
+                        };
+
+                        TableOperation insertConsolidate = TableOperation.Replace(TimesConsolidate);
+                        await timesTable2.ExecuteAsync(insertConsolidate);
+                    }
+                    else
+                    {
+                        ConsolidatedEntity TimesConsolidateTwo = new ConsolidatedEntity
+                        {
+                            IdEmployee = dateTable.IdEmployee,
+                            Date = dateTable.DateHour,
+                            Minutes = dateCalculated.Minutes,
+                            PartitionKey = "TIMES",
+                            RowKey = Guid.NewGuid().ToString(),
+                            ETag = "*"
+                        };
+
+                        TableOperation insertConsolidate = TableOperation.Insert(TimesConsolidateTwo);
+                        await timesTable2.ExecuteAsync(insertConsolidate);
+                    }
+                }
+            }
+
         }
     }
 }
