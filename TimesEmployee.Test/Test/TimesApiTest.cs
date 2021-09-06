@@ -67,6 +67,25 @@ namespace TimesEmployee.Test.Test
             Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
         }
 
+
+        [Fact]
+        public async void DeleteTimes_Should_Return_200()
+        {
+            //Arrenge
+            MockCloudTableTimes mockTimes = new MockCloudTableTimes(new Uri("http://127.0.0.1:10002/devstoreaccount1/reports"));
+            TimesEntity timesEntity = TestFactory.GetTimesEntity();
+            Guid timesId = Guid.NewGuid();
+            DefaultHttpRequest request = TestFactory.CreatedHttpRequest(timesId);
+
+
+            //Act
+            IActionResult response = await TimesApi.DeleteTimes(request, timesEntity, mockTimes, timesId.ToString(), logger);
+
+            //Assert
+            OkObjectResult result = (OkObjectResult)response;
+            Assert.Equal(StatusCodes.Status200OK, result.StatusCode);
+        }
+
     }
 }
 
