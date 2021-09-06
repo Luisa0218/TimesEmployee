@@ -20,4 +20,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TimesEmployee.Functions\TimesEmployee.Functions.csproj" />
+  </ItemGroup>
+
 </Project>
