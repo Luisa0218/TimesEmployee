@@ -1,9 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
+using System;
+using System.Threading.Tasks;
 using TimesEmployee.Functions.Entities;
 
 namespace TimesEmployee.Functions.Functions
@@ -96,7 +95,7 @@ namespace TimesEmployee.Functions.Functions
             {
                 foreach (ConsolidatedEntity reiterateconsolidated in consolidatedEntity)
                 {
-                    //log.LogInformation("Actualizando consolidado segunda tabla");
+
                     if (reiterateconsolidated.IdEmployee == dateTable.IdEmployee)
                     {
 

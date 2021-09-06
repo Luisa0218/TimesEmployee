@@ -212,6 +212,45 @@ namespace TimesEmployee.Functions.Functions
         }
 
 
+        [FunctionName(nameof(GetAllTimesConsolidatedDate))]
+        public static async Task<IActionResult> GetAllTimesConsolidatedDate(
+           [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "timesconsolidate/{DateConsolidated}")] HttpRequest req,
+           [Table("timesconsolidate", Connection = "AzureWebJobsStorage")] CloudTable timesTable,
+           DateTime DateConsolidated,
+           ILogger log)
+           {
+            if (string.IsNullOrEmpty(DateConsolidated.ToString()))
+            {
+                return new BadRequestObjectResult(new Response
+                {
+                    Message = "Insert a DateEmployee"
+                });
+            }
+
+            log.LogInformation("Recieved a new register");
+            string filter = TableQuery.GenerateFilterConditionForDate("Date", QueryComparisons.Equal, DateConsolidated);
+            TableQuery<ConsolidatedEntity> query = new TableQuery<ConsolidatedEntity>().Where(filter);
+            TableQuerySegment<ConsolidatedEntity> allConsolidatedEntity = await timesTable.ExecuteQuerySegmentedAsync(query, null);
+
+            if (allConsolidatedEntity == null || allConsolidatedEntity.Results.Count.Equals(0))
+            {
+                return new OkObjectResult(new Response
+                {
+                    Message = "DateEmployee not found.",
+                });
+            }
+            else
+            {
+                return new OkObjectResult(new Response
+                {
+                    Message = $"Get all registers from consolidate. Date:{DateConsolidated}",
+                    Result = allConsolidatedEntity
+                });
+            }
+
+        }
+
     }
 
 }
+
